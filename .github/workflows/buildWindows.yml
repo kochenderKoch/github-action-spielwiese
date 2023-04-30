@@ -60,7 +60,7 @@ jobs:
         run: flutter build windows --release
       - name: Copy third-party dependencies
         run: |
-          copy "assets\deps\windowsFiles\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
+          copy "assets\deps\windows\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
       - name: Build archive
         uses: thedoctor0/zip-release@master
         with:
