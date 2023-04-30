@@ -28,7 +28,8 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: ${{ env.LLVM_VERSION }}
-      - uses: subosito/flutter-action@v2
+      - name: Install Flutter 
+        uses: subosito/flutter-action@v2
         with:
           channel: "stable"
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -42,10 +43,11 @@ jobs:
           target: ${{ matrix.job.target }}
           override: true
           profile: minimal 
-      - uses: Swatinem/rust-cache@v2
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
         with:
           prefix-key: ${{ matrix.job.os }}
-      - name: Install flutter rust bridge deps
+      - name: Install and generate flutter_rust_bridge dependencies
         run: |
           cargo install flutter_rust_bridge_codegen
           flutter pub get
@@ -54,18 +56,18 @@ jobs:
         run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Enable windows build
         run: flutter create --platforms=windows --project-name=git_act .
-      - name: Build artifacts
+      - name: Build release artifacts
         run: flutter build windows --release
-      - name: copy dependencies
+      - name: Copy third-party dependencies
         run: |
           copy "assets\deps\windowsFiles\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
-      - name: Archive Release
+      - name: Build archive
         uses: thedoctor0/zip-release@master
         with:
           type: "zip"
           filename: Release-${{env.TAG_NAME}}-windows.zip
           directory: build/windows/runner/Release
-      - name: Windows Release
+      - name: Release Windows-Nightly-Build
         uses: softprops/action-gh-release@v1
         #if: startsWith(github.ref, 'refs/tags/')
         env:

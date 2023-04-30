@@ -5,9 +5,9 @@
 .packages
 build/
 target/
-linux/
-windows/
-macos/
+# linux/
+# windows/
+# macos/
 web/
 extraction/
 # If you're building an application, you may want to check-in your pubspec.lock
