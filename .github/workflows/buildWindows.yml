@@ -58,7 +58,7 @@ jobs:
         run: flutter build windows --release
       - name: copy dependencies
         run: |
-          copy "assets\deps\windows\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
+          copy "assets\deps\windowsFiles\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
