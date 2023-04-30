@@ -1,3 +1,4 @@
 windows/** linguist-vendored
 linux/** linguist-vendored
 macos/** linguist-vendored
+assets/** linguist-vendored
