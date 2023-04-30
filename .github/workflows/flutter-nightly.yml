@@ -1,6 +1,11 @@
 name: Flutter Nightly Build
 
-on: workflow_dispatch
+on:
+  workflow_call:
+    secrets:
+      envPAT:
+        required: true 
+  workflow_dispatch:
 
 jobs:
   run-flutter-windows-nightly-build:
