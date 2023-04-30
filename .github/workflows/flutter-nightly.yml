@@ -1,0 +1,20 @@
+name: Flutter Nightly Build
+
+on: workflow_dispatch
+
+jobs:
+  run-flutter-windows-nightly-build:
+    uses: ./.github/workflows/buildWindows.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
+  run-flutter-windows-nightly-build:
+    uses: ./.github/workflows/buildLinux.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
+  run-flutter-windows-nightly-build:
+    uses: ./.github/workflows/buildMac.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
