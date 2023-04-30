@@ -49,7 +49,6 @@ jobs:
         run: |
           cargo install flutter_rust_bridge_codegen
           flutter pub get
-          flutter pub run flutter_launcher_icons 
           ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --dart-decl-output lib/bridge_definitions.dart
       - name: Generate intermediates
         run: flutter pub run build_runner build --delete-conflicting-outputs
