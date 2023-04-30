@@ -76,6 +76,11 @@ jobs:
         run: flutter create --platforms=linux --project-name=google_exporter .
       - name: Build artifacts
         run: flutter build linux --release
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: linux-release
+          path: build/linux/
   release-linux:
     needs: [build-linux]
     name: Release Linux-x86
@@ -91,6 +96,10 @@ jobs:
               extra-build-features: "",
             }
     steps:  
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux-release
+          path: build/linux/
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
@@ -121,6 +130,12 @@ jobs:
               extra-build-features: "",
             }
     steps:
+    - name: Checkout source code
+        uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+        with:
+          name: linux-release
+          path: build/linux/
     - name: Build AppImage unsing appimage-builder
       uses: docker://appimagecrafters/appimage-builder:0.8.5
       with:
