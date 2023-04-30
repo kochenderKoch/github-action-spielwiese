@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-and-release-windows:
-    name: OS ${{ matrix.os }}
+    name: Build Windows-x64
     runs-on: windows-latest
     strategy:
       fail-fast: false
