@@ -56,11 +56,9 @@ jobs:
         run: flutter create --platforms=windows --project-name=git_act .
       - name: Build artifacts
         run: flutter build windows --release
-      - name: copy file
-        uses: canastro/copy-file-action@master
-        with:
-          source: "assets/deps/windows/sqlite3.dll"
-          target: "build/windows/runner/Release/sqlite3.dll"
+      - name: copy dependencies
+        run: |
+          copy "assets\deps\windows\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
