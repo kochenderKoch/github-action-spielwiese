@@ -4,22 +4,59 @@ name: Build and release mac project
 #   push:
 #     branches:
 #       - main
+on: workflow_dispatch
+
 
 env:
-  TAG_NAME: "nighly"
+  LLVM_VERSION: "15.0.6"
+  FLUTTER_VERSION: "3.7.9"
+  TAG_NAME: "nightly"
 
 jobs:
   build-and-release-macos:
+    name: Build MacOS-x64
     runs-on: macos-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - {
+              target: x86_64-apple-darwin,
+              os: macos-latest,
+              extra-build-args: "",
+              arch: x86_64
+            }
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: ${{ env.LLVM_VERSION }}
+      - name: Install Flutter 
+        uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          #flutter-version: '3.7.9'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
       - name: Install project dependencies
         run: flutter pub get
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.job.os }}
+      - name: Install and generate flutter_rust_bridge dependencies
+        run: |
+          cargo install flutter_rust_bridge_codegen
+          flutter pub get
+          ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --dart-decl-output lib/bridge_definitions.dart -e macos/Runner/
       - name: Generate intermediates
         run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Enable macOS build
@@ -30,7 +67,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: "zip"
-          filename: GoogleExporter-${{env.TAG_NAME}}-macos.zip
+          filename: Release-${{env.TAG_NAME}}-macos.zip
           directory: build/macos/Build/Products/Release
       - name: macOS Release
         uses: softprops/action-gh-release@v1
@@ -40,4 +77,4 @@ jobs:
         with:
           prerelease: true
           tag_name: ${{env.TAG_NAME}}
-          files: build/macos/Build/Products/Release/GoogleExporter-${{env.TAG_NAME}}-macos.zip
+          files: build/macos/Build/Products/Release/Release-${{env.TAG_NAME}}-macos.zip
