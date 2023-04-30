@@ -12,7 +12,7 @@ env:
   TAG_NAME: "nightly"
 
 jobs:
-  build-and-release-linux:
+  build-linux:
     name: Build Linux-x86
     runs-on: ubuntu-latest
     strategy:
@@ -76,6 +76,21 @@ jobs:
         run: flutter create --platforms=linux --project-name=google_exporter .
       - name: Build artifacts
         run: flutter build linux --release
+  release-linux:
+    needs: [build-linux]
+    name: Release Linux-x86
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - {
+              arch: x86_64,
+              target: x86_64-unknown-linux-gnu,
+              os: ubuntu-latest, 
+              extra-build-features: "",
+            }
+    steps:  
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
@@ -91,3 +106,37 @@ jobs:
           prerelease: true
           tag_name: ${{env.TAG_NAME}}
           files: build/linux/x64/release/bundle/Release-${{env.TAG_NAME}}-linux.zip
+  release-AppImage:
+    needs: [build-linux]
+    name: Release AppImage
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - {
+              arch: x86_64,
+              target: x86_64-unknown-linux-gnu,
+              os: ubuntu-latest, 
+              extra-build-features: "",
+            }
+    steps:
+    - name: Build AppImage unsing appimage-builder
+      uses: docker://appimagecrafters/appimage-builder:0.8.5
+      with:
+        entrypoint: appimage-builder
+        args: --recipe ./appimage/AppImageBuilder-x86_64.yml --skip-test
+    - name: Save build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: AppImage
+        path: './*.AppImage*'
+    - name: Release AppImage
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        title: Continuous build
+        automatic_release_tag: ${{env.TAG_NAME}}
+        prerelease: true
+        draft: false
+        files: './*.AppImage*'
+        repo_token: ${{ secrets.TOKEN }}
