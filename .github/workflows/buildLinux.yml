@@ -1,4 +1,5 @@
 name: Build and release Linux
+
 # on:
 #   push:
 #     branches:
@@ -12,7 +13,7 @@ env:
 
 jobs:
   build-and-release-linux:
-      name: Build Linux-x86
+    name: Build Linux-x86
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
