@@ -8,12 +8,12 @@ jobs:
     secrets: inherit
     with:
       upload-artifact: true
-  run-flutter-windows-nightly-build:
+  run-flutter-linux-nightly-build:
     uses: ./.github/workflows/buildLinux.yml
     secrets: inherit
     with:
       upload-artifact: true
-  run-flutter-windows-nightly-build:
+  run-flutter-macos-nightly-build:
     uses: ./.github/workflows/buildMac.yml
     secrets: inherit
     with:
