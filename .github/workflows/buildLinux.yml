@@ -1,9 +1,9 @@
 name: Build and release linux project
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
 env:
   TAG_NAME: "nighly"
