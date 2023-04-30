@@ -1,25 +1,160 @@
-name: Flutter Nightly Build
+name: Build Nightly
 
-on:
-  workflow_call:
-    secrets:
-      envPAT:
-        required: true 
-  workflow_dispatch:
+# on:
+#   push:
+#     branches:
+#       - main
+on: workflow_dispatch
+
+
+env:
+  LLVM_VERSION: "15.0.6"
+  FLUTTER_VERSION: "3.7.9"
+  TAG_NAME: "nightly"
 
 jobs:
-  run-flutter-windows-nightly-build:
-    uses: ./.github/workflows/buildWindows.yml
-    secrets: inherit
-    with:
-      upload-artifact: true
-  run-flutter-linux-nightly-build:
-    uses: ./.github/workflows/buildLinux.yml
-    secrets: inherit
-    with:
-      upload-artifact: true
-  run-flutter-macos-nightly-build:
-    uses: ./.github/workflows/buildMac.yml
-    secrets: inherit
-    with:
-      upload-artifact: true
+  build-and-release-windows:
+    name: Build Windows-x64
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job: 
+          - { target: x86_64-pc-windows-msvc, os: windows-latest, arch: x86_64 }
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: ${{ env.LLVM_VERSION }}
+      - name: Install Flutter 
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Install project dependencies
+        run: flutter pub get
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.job.os }}
+      - name: Install and generate flutter_rust_bridge dependencies
+        run: |
+          cargo install flutter_rust_bridge_codegen
+          flutter pub get
+          ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --dart-decl-output lib/bridge_definitions.dart
+      - name: Generate intermediates
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Enable windows build
+        run: flutter create --platforms=windows --project-name=git_act .
+      - name: Build release artifacts
+        run: flutter build windows --release
+      - name: Copy third-party dependencies
+        run: |
+          copy "assets\deps\windows\sqlite3.dll" "build\windows\runner\Release\sqlite3.dll"
+      - name: Build archive
+        uses: thedoctor0/zip-release@master
+        with:
+          type: "zip"
+          filename: Release-${{env.TAG_NAME}}-windows.zip
+          directory: build/windows/runner/Release
+      - name: Release Windows-Nightly-Build
+        uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          prerelease: true
+          tag_name: ${{env.TAG_NAME}}
+          files: build/windows/runner/Release/Release-${{env.TAG_NAME}}-windows.zip
+  build-and-release-linux:
+    name: Build Linux-x86
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - {
+              arch: x86_64,
+              target: x86_64-unknown-linux-gnu,
+              os: ubuntu-latest, 
+              extra-build-features: "",
+            }
+          # - {
+          #     arch: x86_64,
+          #     target: x86_64-unknown-linux-gnu,
+          #     os: ubuntu-18.04,
+          #     extra-build-features: "flatpak",
+          #   }
+          # - {
+          #     arch: x86_64,
+          #     target: x86_64-unknown-linux-gnu,
+          #     os: ubuntu-18.04,
+          #     extra-build-features: "appimage",
+          #   }
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: ${{ env.LLVM_VERSION }}
+      - name: Install Flutter 
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Install dependencies
+        run: sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+      - name: Install project dependencies
+        run: flutter pub get
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.job.os }}
+      - name: Install and generate flutter_rust_bridge dependencies
+        run: |
+          cargo install flutter_rust_bridge_codegen
+          flutter pub get
+          ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --dart-decl-output lib/bridge_definitions.dart
+      - name: Generate intermediates
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Enable linux build
+        run: flutter create --platforms=linux --project-name=google_exporter .
+      - name: Build artifacts
+        run: flutter build linux --release
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: "zip"
+          filename: Release-${{env.TAG_NAME}}-linux.zip
+          directory: build/linux/x64/release/bundle
+      - name: Linux Release
+        uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          prerelease: true
+          tag_name: ${{env.TAG_NAME}}
+          files: build/linux/x64/release/bundle/Release-${{env.TAG_NAME}}-linux.zip
+
+
+
