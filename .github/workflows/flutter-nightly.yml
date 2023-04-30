@@ -155,6 +155,74 @@ jobs:
           prerelease: true
           tag_name: ${{env.TAG_NAME}}
           files: build/linux/x64/release/bundle/Release-${{env.TAG_NAME}}-linux.zip
+  build-and-release-macos:
+    name: Build MacOS-x64
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - {
+              target: x86_64-apple-darwin,
+              os: macos-latest,
+              extra-build-args: "",
+              arch: x86_64
+            }
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      # - name: Install LLVM and Clang
+      #   uses: KyleMayes/install-llvm-action@v1
+      #   with:
+      #     version: ${{ env.LLVM_VERSION }}
+      - name: Install build runtime
+        run: |
+          brew install llvm create-dmg nasm yasm cmake gcc wget ninja pkg-config
+      - name: Install Flutter 
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Install project dependencies
+        run: flutter pub get
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.job.os }}
+      - name: Install and generate flutter_rust_bridge dependencies
+        run: |
+          cargo install flutter_rust_bridge_codegen
+          flutter pub get
+          ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --dart-decl-output lib/bridge_definitions.dart -e macos/Runner/
+      - name: Generate intermediates
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Enable macOS build
+        run: flutter create --platforms=macos --project-name=google_exporter .
+      - name: Build artifacts
+        run: flutter build macos --release
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: "zip"
+          filename: Release-${{env.TAG_NAME}}-macos.zip
+          directory: build/macos/Build/Products/Release
+      - name: macOS Release
+        uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          prerelease: true
+          tag_name: ${{env.TAG_NAME}}
+          files: build/macos/Build/Products/Release/Release-${{env.TAG_NAME}}-macos.zip
 
 
 
