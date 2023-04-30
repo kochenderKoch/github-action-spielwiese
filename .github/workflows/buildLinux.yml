@@ -1,28 +1,74 @@
-name: Build and release linux project
-
+name: Build and release Linux
 # on:
 #   push:
 #     branches:
 #       - main
+on: workflow_dispatch
 
 env:
+  LLVM_VERSION: "15.0.6"
+  FLUTTER_VERSION: "3.7.9"
   TAG_NAME: "nighly"
 
 jobs:
   build-and-release-linux:
+      name: build-git_act ${{ matrix.job.target }} (${{ matrix.job.os }}) [${{ matrix.job.extra-build-features }}]
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - {
+              arch: x86_64,
+              target: x86_64-unknown-linux-gnu,
+              os: ubuntu-latest, 
+              extra-build-features: "",
+            }
+          # - {
+          #     arch: x86_64,
+          #     target: x86_64-unknown-linux-gnu,
+          #     os: ubuntu-18.04,
+          #     extra-build-features: "flatpak",
+          #   }
+          # - {
+          #     arch: x86_64,
+          #     target: x86_64-unknown-linux-gnu,
+          #     os: ubuntu-18.04,
+          #     extra-build-features: "appimage",
+          #   }
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: ${{ env.LLVM_VERSION }}
+      - name: Install Flutter 
+        uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          #flutter-version: '3.7.9'
-      - run: flutter --version
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
       - name: Install dependencies
         run: sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
       - name: Install project dependencies
         run: flutter pub get
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.job.os }}
+      - name: Install and generate flutter_rust_bridge dependencies
+        run: |
+          cargo install flutter_rust_bridge_codegen
+          flutter pub get
+          ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --dart-decl-output lib/bridge_definitions.dart
       - name: Generate intermediates
         run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Enable linux build
@@ -33,7 +79,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: "zip"
-          filename: GoogleExporter-${{env.TAG_NAME}}-linux.zip
+          filename: Release-${{env.TAG_NAME}}-linux.zip
           directory: build/linux/x64/release/bundle
       - name: Linux Release
         uses: softprops/action-gh-release@v1
@@ -43,4 +89,4 @@ jobs:
         with:
           prerelease: true
           tag_name: ${{env.TAG_NAME}}
-          files: build/linux/x64/release/bundle/GoogleExporter-${{env.TAG_NAME}}-linux.zip
+          files: build/linux/x64/release/bundle/Release-${{env.TAG_NAME}}-linux.zip
