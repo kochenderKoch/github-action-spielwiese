@@ -1,0 +1,61 @@
+{
+    "services": [
+        {
+            "app": "Chrome",
+            "id": "com.android.chrome",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": [""],
+            "minScopes": []            
+        }, 
+        {
+            "app": "Gmail",
+            "id": "com.google.android.gm",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": ["https://mail.google.com/", "https://www.googleapis.com/auth/gmail.full_access", "https://www.googleapis.com/auth/gmail.ads", "https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/taskassist.readonly", "https://www.googleapis.com/auth/reminders", "https://www.googleapis.com/auth/gmail.locker.read", "https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/chat", "https://www.googleapis.com/auth/gmail.publisher_first_party", "https://www.googleapis.com/auth/drive"],
+            "minScopes": ["https://mail.google.com/", "https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.metadata"]
+        },
+        {
+            "app": "Google Drive",
+            "id": "com.google.android.apps.docs",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": [""],
+            "minScopes": ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.appdata", "https://www.googleapis.com/auth/drive.metadata", "https://www.googleapis.com/auth/drive.photos.readonly"]
+        },
+        {
+            "app": "Google Play Store",
+            "id": "com.android.vending",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": [""],
+            "minScopes": []
+        },
+        {
+            "app": "Google Contacts",
+            "id": "com.google.android.contacts",
+            "clientSig": "ee3e2b5d95365c5a1ccc2d8dfe48d94eb33b3ebe",
+            "scopes": ["https://www.googleapis.com/auth/contacts", "https://www.googleapis.com/auth/contacts.readonly", "https://www.googleapis.com/auth/directory.readonly", "https://www.googleapis.com/auth/profile.agerange.read", "https://www.googleapis.com/auth/profile.emails.read", "https://www.googleapis.com/auth/profile.language.read", "https://www.googleapis.com/auth/user.addresses.read", "https://www.googleapis.com/auth/user.birthday.read", "https://www.googleapis.com/auth/user.emails.read", "https://www.googleapis.com/auth/user.gender.read", "https://www.googleapis.com/auth/user.organization.read", "https://www.googleapis.com/auth/user.phonenumbers.read", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
+        ,
+            "minScopes": []
+        },
+        {
+            "app": "Google Play-Dienste",
+            "id": "com.google.android.gms",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": [""],
+            "minScopes": []
+        },
+        {
+            "app": "Google Play Spiele",
+            "id": "com.google.android.play.games",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": [""],
+            "minScopes": []
+        },
+        {
+            "app": "Google Contacts Sync",
+            "id": "com.google.android.syncadapters.calendar",
+            "clientSig": "38918a453d07199354f8b19af05ec6562ced5788",
+            "scopes": [""],
+            "minScopes": []
+        }
+    ]
+}
