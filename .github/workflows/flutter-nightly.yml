@@ -227,7 +227,7 @@ jobs:
       with:
         prerelease: true
         tag_name: ${{env.TAG_NAME}}
-        files: './git-act*.AppImage*'
+        files: './*.AppImage*'
 
   build-and-release-macos:
     name: Build MacOS-x64

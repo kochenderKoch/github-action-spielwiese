@@ -163,4 +163,4 @@ jobs:
         with:
           prerelease: true
           tag_name: ${{env.TAG_NAME}}
-          files: './git-act*.AppImage*'
+          files: './*.AppImage*'
