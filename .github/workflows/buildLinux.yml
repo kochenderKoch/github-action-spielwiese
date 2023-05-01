@@ -149,7 +149,7 @@ jobs:
     - name: Release AppImage
       uses: marvinpinto/action-automatic-releases@latest
       with:
-        title: Continuous build
+        title: ${{env.TAG_NAME}}
         automatic_release_tag: ${{env.TAG_NAME}}
         prerelease: true
         draft: false
