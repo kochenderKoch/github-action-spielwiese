@@ -200,16 +200,28 @@ jobs:
       with:
         name: linux-release
         path: build/linux/
-    - name: Build AppImage unsing appimage-builder
-      uses: docker://appimagecrafters/appimage-builder:latest
-      with:
-        entrypoint: appimage-builder
-        args: --recipe ./appimage/AppImageBuilder-x86_64.yml --skip-test
+    # - name: Build AppImage unsing appimage-builder
+    #   uses: docker://appimagecrafters/appimage-builder:latest
+    #   with:
+    #     entrypoint: appimage-builder
+    #     args: --recipe ./appimage/AppImageBuilder-x86_64.yml --skip-test
+    - name: Build appimage package
+      shell: bash
+      run: |
+        # set-up appimage-builder
+        pushd /tmp
+        wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+        chmod +x appimage-builder-x86_64.AppImage
+        sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
+        popd
+        # run appimage-builder
+        pushd appimage
+        sudo appimage-builder --skip-tests --recipe ./AppImageBuilder-${{ matrix.job.arch }}.yml
     - name: Save build Artifact
       uses: actions/upload-artifact@v2
       with:
         name: AppImage
-        path: './*.AppImage*'
+        path: 'appimage/*.AppImage*'
     # - name: Release AppImage
     #   uses: marvinpinto/action-automatic-releases@latest
     #   with:
@@ -227,7 +239,7 @@ jobs:
       with:
         prerelease: true
         tag_name: ${{env.TAG_NAME}}
-        files: './*.AppImage*'
+        files: 'appimage/*.AppImage*'
 
   build-and-release-macos:
     name: Build MacOS-x64
