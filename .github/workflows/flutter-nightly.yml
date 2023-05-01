@@ -218,11 +218,11 @@ jobs:
     #     pushd appimage
     #     sudo appimage-builder --skip-tests --recipe ./AppImageBuilder-${{ matrix.job.arch }}.yml
     - name: Rename AppImage
-        shell: bash
-        run: |
-          for name in appimage/*.AppImage*; do
-              mv "$name" "appimage/${name%%.deb}-${{ matrix.job.arch }}.AppImage"
-          done
+      shell: bash
+      run: |
+        for name in appimage/*.AppImage*; do
+            mv "$name" "appimage/${name%%.deb}-${{ matrix.job.arch }}.AppImage"
+        done
     - name: Save build Artifact
       uses: actions/upload-artifact@v2
       with:
