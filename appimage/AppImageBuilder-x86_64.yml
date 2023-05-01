@@ -8,6 +8,7 @@ AppDir:
     - cp build/linux/x64/release/bundle/git_act AppDir
     - cp -r build/linux/x64/release/bundle/lib/. AppDir/lib
     - cp -r build/linux/x64/release/bundle/data AppDir
+    - mkdir -p AppDir/usr/share/icons/
     - cp flutter-mark-square-64.png AppDir/usr/share/icons/
   path: ./AppDir
   app_info:
