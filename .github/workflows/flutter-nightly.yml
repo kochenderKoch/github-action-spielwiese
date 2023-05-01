@@ -220,14 +220,14 @@ jobs:
     #     files: './*.AppImage*'
     #     repo_token: ${{ secrets.TOKEN }}
     - name: Release AppImage-Nightly-Build
-        uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
         #if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        with:
-          prerelease: true
-          tag_name: ${{env.TAG_NAME}}
-          files: './git-act*.AppImage*'
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      with:
+        prerelease: true
+        tag_name: ${{env.TAG_NAME}}
+        files: './git-act*.AppImage*'
 
   build-and-release-macos:
     name: Build MacOS-x64
