@@ -11,7 +11,7 @@ AppDir:
   app_info:
     id: de.kochenderkoch.git-act
     name: git_act
-    icon: assets/logo/profile.png
+    icon: AppDir/usr/share/icons/hicolor/64x64/apps/profile.png
     version: nightly
     exec: git_act
     exec_args: $@
