@@ -2,14 +2,13 @@
 version: 1
 script:
  - rm -rf AppDir || true
- - mkdir AppDir
+ - cp build/linux/x64/release/bundle/git_act AppDir
+ - cp -r build/linux/x64/release/bundle/lib/. AppDir/lib
+ - cp -r build/linux/x64/release/bundle/data AppDir
+ - mkdir -p AppDir/usr/share/icons/hicolor/64x64/apps/
+ #- mv AppDir/lib/ AppDir/usr/
+ - cp flutter-mark-square-64.png AppDir/usr/share/icons/hicolor/64x64/apps/
 AppDir:
-  after_bundle:
-    - cp build/linux/x64/release/bundle/git_act AppDir
-    - cp -r build/linux/x64/release/bundle/lib/. AppDir/lib
-    - cp -r build/linux/x64/release/bundle/data AppDir
-    - mkdir -p AppDir/usr/share/icons/
-    - cp flutter-mark-square-64.png AppDir/usr/share/icons/
   path: ./AppDir
   app_info:
     id: de.kochenderkoch.git-act
