@@ -229,7 +229,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: AppImage
-        path: 'appimage/*.AppImage*'
+        path: './*.AppImage*'
     # - name: Release AppImage
     #   uses: marvinpinto/action-automatic-releases@latest
     #   with:
@@ -247,7 +247,7 @@ jobs:
       with:
         prerelease: true
         tag_name: ${{env.TAG_NAME}}
-        files: 'appimage/*.AppImage*'
+        files: './*.AppImage*'
 
   build-and-release-macos:
     name: Build MacOS-x64
