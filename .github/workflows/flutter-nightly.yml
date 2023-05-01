@@ -201,7 +201,7 @@ jobs:
         name: linux-release
         path: build/linux/
     - name: Build AppImage unsing appimage-builder
-      uses: docker://appimagecrafters/appimage-builder:0.8.5
+      uses: docker://appimagecrafters/appimage-builder:latest
       with:
         entrypoint: appimage-builder
         args: --recipe ./appimage/AppImageBuilder-x86_64.yml --skip-test
