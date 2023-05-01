@@ -196,6 +196,10 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v3
+    - name: "Install dependencies"
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build build-essential pkg-config curl file git unzip xz-utils zip libgtk-3-dev
     - uses: actions/download-artifact@v3
       with:
         name: linux-release

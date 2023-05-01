@@ -2,11 +2,9 @@
 version: 1
 script:
  - rm -rf AppDir || true
- - cp build/linux/x64/release/bundle/git_act AppDir
- - cp -r build/linux/x64/release/bundle/lib/. AppDir/lib
- - cp -r build/linux/x64/release/bundle/data AppDir
+ - cp -r build/linux/x64/release/bundle AppDir
  - mkdir -p AppDir/usr/share/icons/hicolor/64x64/apps/
- #- mv AppDir/lib/ AppDir/usr/
+ - mv AppDir/lib/ AppDir/usr/
  - cp flutter-mark-square-64.png AppDir/usr/share/icons/hicolor/64x64/apps/
 AppDir:
   path: ./AppDir
